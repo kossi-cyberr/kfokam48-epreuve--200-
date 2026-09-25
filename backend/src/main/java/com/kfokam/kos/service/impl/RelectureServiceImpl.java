@@ -163,8 +163,8 @@ public class RelectureServiceImpl implements RelectureService {
     }
 
     @Override
-    public List<RelectureResponse> findEnAttente(Long relecteurId) {
-        return relectureRepository.findByRelecteurIdAndNoteIsNull(relecteurId).stream()
+    public List<RelectureResponse> findParRelecteur(Long relecteurId) {
+        return relectureRepository.findByRelecteurId(relecteurId).stream()
                 .map(RelectureResponse::from)
                 .toList();
     }

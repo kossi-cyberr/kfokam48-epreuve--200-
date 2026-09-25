@@ -6,15 +6,19 @@ import java.util.List;
 
 public interface RelectureService {
 
-    RelectureResponse create(RelectureRequest request);
+    /** Q6/Q7 : assigne au hasard un relecteur parmi les étudiants présents à la session. */
+    RelectureResponse assigner(Long exerciceId, Long relecteurId);
+
+    /** Contrat imposé : POST /api/relectures/{id} — le relecteur rend note et commentaire. */
+    RelectureResponse rendre(Long id, RelectureRequest request);
+
+    /** Q10/RG9 : le relecteur peut corriger sa note tant que le formateur n'a pas clôturé. */
+    RelectureResponse corriger(Long id, RelectureRequest request);
 
     RelectureResponse findById(Long id);
 
     RelectureResponse findByExerciceId(Long exerciceId);
 
-    List<RelectureResponse> findAllByExerciceId(Long exerciceId);
-
-    boolean existsByExerciceId(Long exerciceId);
-
-    boolean canModify(Long relectureId, Long sessionId);
+    /** Relectures assignées à un relecteur et pas encore rendues. */
+    List<RelectureResponse> findEnAttente(Long relecteurId);
 }

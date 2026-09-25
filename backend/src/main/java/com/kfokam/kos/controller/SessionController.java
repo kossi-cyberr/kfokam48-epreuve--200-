@@ -5,6 +5,7 @@ import com.kfokam.kos.dto.SessionResponse;
 import com.kfokam.kos.service.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +19,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/sessions")
-@Tag(name = "Sessions", description = "Gestion des sessions de présence")
+@Tag(name = "Sessions", description = "Sessions de cours et codes de présence")
 public class SessionController {
 
     private final SessionService sessionService;
 
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
+    }
+
+    @PostMapping
+    @Operation(summary = "Le formateur ouvre une session et obtient un code (contrat imposé)")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SessionResponse create(@Valid @RequestBody SessionRequest request) {
+        return sessionService.open(request.getTitre(), request.getPromotionId());
+    }
+
+    @PostMapping("/{id}/cloture")
+    @Operation(summary = "Le formateur clôture la session (Q12 : plus de dépôts ensuite)")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cloturer(@PathVariable Long id) {
+        sessionService.close(id);
     }
 
     @GetMapping
@@ -37,12 +52,5 @@ public class SessionController {
     @Operation(summary = "Récupérer une session")
     public SessionResponse getById(@PathVariable Long id) {
         return sessionService.findById(id);
-    }
-
-    @PostMapping
-    @Operation(summary = "Ouvrir une session et obtenir un code de présence")
-    @ResponseStatus(HttpStatus.CREATED)
-    public SessionResponse create(@RequestBody SessionRequest request) {
-        return sessionService.open(request.getTitre(), request.getPromotionId());
     }
 }

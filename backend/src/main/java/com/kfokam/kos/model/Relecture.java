@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -32,10 +34,11 @@ public class Relecture {
     @Column(nullable = false)
     private Long relecteurId;
 
-    @Column(nullable = false)
+    /** Null tant que le relecteur n'a pas rendu sa relecture. */
+    @Column
     private Integer note;
 
-    @Column(nullable = false, length = 2000)
+    @Column(length = 2000)
     private String commentaire;
 
     @Column(nullable = false, updatable = false)

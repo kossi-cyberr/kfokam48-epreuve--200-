@@ -6,10 +6,10 @@ import com.kfokam.kos.dto.ManualPresenceRequest;
 import com.kfokam.kos.service.PresenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,17 +29,17 @@ public class PresenceController {
     }
 
     @PostMapping
-    @Operation(summary = "Marquer sa présence avec un code")
+    @Operation(summary = "Marquer sa présence avec un code (contrat imposé)")
     @ResponseStatus(HttpStatus.CREATED)
-    public PresenceResponse create(@RequestBody PresenceRequest request) {
+    public PresenceResponse create(@Valid @RequestBody PresenceRequest request) {
         return presenceService.markPresence(request.getCode(), request.getEtudiantId());
     }
 
-    @PostMapping("/{id}/manual")
-    @Operation(summary = "Ajouter une présence à la main (formateur)")
+    @PostMapping("/manual")
+    @Operation(summary = "Le formateur ajoute une présence à la main (Q14, source=FORMATEUR)")
     @ResponseStatus(HttpStatus.CREATED)
-    public PresenceResponse createManual(@PathVariable Long id, @RequestBody ManualPresenceRequest request) {
-        return presenceService.addManualPresence(id, request.getEtudiantId());
+    public PresenceResponse createManual(@Valid @RequestBody ManualPresenceRequest request) {
+        return presenceService.addManualPresence(request.getSessionId(), request.getEtudiantId());
     }
 
     @GetMapping

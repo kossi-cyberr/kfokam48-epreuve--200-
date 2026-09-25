@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,10 @@ public class Student {
 
     @Column(nullable = false, unique = true, length = 20)
     private String matricule;
+
+    /** Promotion de l'étudiant (tableau du formateur par promotion, Q16). */
+    @Column(name = "promotion_id")
+    private Long promotionId;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

@@ -138,7 +138,11 @@ export default function PageFormateur() {
                 <td>{ligne.nom}</td>
                 <td>{ligne.presences}</td>
                 <td>{ligne.exercicesDeposes}</td>
-                <td>{ligne.moyenne == null ? "—" : ligne.moyenne.toFixed(2)}</td>
+                <td>
+                  {ligne.moyenne == null
+                    ? "—"
+                    : ligne.moyenne.toFixed(2) + (ligne.moyenneProvisoire ? " (provisoire)" : "")}
+                </td>
                 <td>{ligne.relecturesEnAttente}</td>
               </tr>
             ))}

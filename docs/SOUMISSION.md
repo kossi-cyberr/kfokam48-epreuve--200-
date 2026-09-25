@@ -34,8 +34,8 @@
 
 | | |
 |---|---|
-| Frontend utilisé | React (Next.js) |
-| Base de données | PostgreSQL (via Docker, h2 pour les tests) |
+| Frontend utilisé | React (Next.js 16) |
+| Base de données | PostgreSQL 17 (via Docker, H2 pour tests) |
 | Commandes de démarrage | `docker compose up --build` (ou 3 commandes sans Docker) |
 
 ## Ce que j'ai livré

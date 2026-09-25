@@ -29,3 +29,18 @@ Ce backlog est organisé par priorité (Must / Should / Could) et couvre l'étap
 |---|---|---|---|---|
 | 12 | Enlever la présence d'un étudiant | Le formateur peut supprimer une présence, elle disparaît du tableau | Could | — |
 | 13 | Voir l'historique de ses présences | Un étudiant voit ses présences passées | Could | — |
+
+---
+
+## Backlog restant (post-[JALON] v1.0) — frontend
+
+Issues ouvertes après la livraison, triées par priorité. Elles constituent le "backlog restant trié" exigé à l'étape 4.
+
+| # | Titre | Priorité | Réf | Issue |
+|---|---|---|---|---|
+| 14 | L'écran formateur affiche « note provisoire » quand un seul des 2 relecteurs a rendu | Must | EF5, RG8 (enveloppe) | #32 |
+| 15 | Le formateur ajoute une présence manuelle depuis son écran | Should | EF6, RG14 | #33 |
+| 16 | L'étudiant choisit sa session de dépôt dans une liste | Should | EF2, Q12 | #34 |
+| 17 | L'écran relecteur affiche le statut PROVISOIRE / RELEVE | Could | RG8 (enveloppe) | #35 |
+
+Les tickets 1 à 13 (issues #1 à #15) sont livrés et fermés par les PR #16 à #31.

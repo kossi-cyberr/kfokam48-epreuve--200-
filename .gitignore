@@ -1,0 +1,8 @@
+# Secrets / variables locales (garder .env.example)
+.env
+.env.local
+!.env.example
+
+# Divers
+*.log
+.DS_Store

@@ -1,0 +1,85 @@
+# =====================================================================
+# Pile complète de l'épreuve fullstack :
+#   db (PostgreSQL) -> adminer -> backend (Spring Boot) -> frontend (Next.js)
+#
+#   docker compose up --build
+#
+#   Front      http://localhost:3010
+#   Swagger    http://localhost:8090/swagger-ui.html
+#   Adminer    http://localhost:8083  (serveur : db, base/mot de passe : kos)
+#   API        http://localhost:8090/api/items
+# =====================================================================
+name: kos
+
+services:
+  # ------------------------------- PostgreSQL -------------------------------
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kos}
+      POSTGRES_USER: ${POSTGRES_USER:-kos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kos}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-5437}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  # -------------------------------- Adminer --------------------------------
+  adminer:
+    image: adminer:4
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: pepa-linha
+    ports:
+      - "${ADMINER_HOST_PORT:-8083}:8080"
+    restart: unless-stopped
+
+  # ---------------------------- Backend Spring -----------------------------
+  backend:
+    build:
+      context: ./backend
+      # Dépôt Maven local de l'hôte réutilisé pendant le build (gain de temps énorme)
+      additional_contexts:
+        m2: ${HOME}/.m2/repository
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-kos}
+      DB_USERNAME: ${POSTGRES_USER:-kos}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-kos}
+      # Origines autorisées côté CORS (le navigateur parle à http://localhost:3010)
+      CORS_ALLOWED_ORIGINS: http://localhost:3010,http://127.0.0.1:3010
+    ports:
+      - "${BACKEND_HOST_PORT:-8090}:8080"
+    restart: unless-stopped
+
+  # ---------------------------- Frontend Next ------------------------------
+  frontend:
+    build:
+      context: ./frontend/kossi-app
+      args:
+        # URL de l'API vue PAR LE NAVIGATEUR (injectée dans le bundle client au build)
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8090}
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      # URL de l'API vue PAR LE SERVEUR NEXT (Server Components) : réseau interne
+      API_URL: http://backend:8080
+    ports:
+      - "${FRONTEND_HOST_PORT:-3010}:3000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -45,10 +45,17 @@ public class PresenceServiceImpl implements PresenceService {
             throw new ResourceNotFoundException("ETUDIANT_INCONNU", "Étudiant introuvable");
         }
 
-        Session session = sessionRepository.findByCode(code)
-                .orElseThrow(() -> new ApiBusinessException(
-                        "CODE_INCONNU", "Le code de présence n'existe pas",
-                        org.springframework.http.HttpStatus.BAD_REQUEST));
+        Session session;
+        try {
+            session = sessionRepository.findByCode(code)
+                    .orElseThrow(() -> new ApiBusinessException(
+                            "CODE_INCONNU", "Le code de présence n'existe pas",
+                            org.springframework.http.HttpStatus.BAD_REQUEST));
+        } catch (ApiBusinessException e) {
+            // Q4 : chaque code erroné compte ; au 5e, l'étudiant est bloqué 2 minutes
+            noterEchec(etudiantId);
+            throw e;
+        }
 
         if (session.getClotee()) {
             throw new ApiBusinessException("SESSION_CLOTUREE", "La session est clôturée",

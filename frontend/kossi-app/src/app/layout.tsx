@@ -13,9 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <header className="entete">
           <Link href="/" className="marque">
+            <span className="puce" aria-hidden="true" />
             KOS
           </Link>
-          <nav>
+          <nav aria-label="Navigation principale">
             <Link href="/">Formateur</Link>
             <Link href="/etudiant">Étudiant</Link>
             <Link href="/relecteur">Relecteur</Link>

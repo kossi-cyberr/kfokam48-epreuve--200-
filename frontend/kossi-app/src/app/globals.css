@@ -1,0 +1,147 @@
+:root {
+  --fond: #f6f7fb;
+  --carte: #ffffff;
+  --encre: #1c2333;
+  --doux: #5b6478;
+  --bordure: #e3e6ef;
+  --primaire: #2f5cff;
+  --ok: #178a50;
+  --erreur: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--fond);
+  color: var(--encre);
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--carte);
+  border-bottom: 1px solid var(--bordure);
+}
+
+.marque {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--encre);
+}
+
+.entete nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.entete nav a {
+  text-decoration: none;
+  color: var(--doux);
+}
+
+.entete nav a:hover {
+  color: var(--primaire);
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+h1 {
+  font-size: 1.4rem;
+}
+
+.carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.9rem;
+  color: var(--doux);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--primaire);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secondaire {
+  background: var(--doux);
+}
+
+.erreur {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  background: #fdecec;
+  color: var(--erreur);
+}
+
+.succes {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  background: #e8f7ee;
+  color: var(--ok);
+}
+
+.info {
+  color: var(--doux);
+  font-size: 0.9rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--carte);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--bordure);
+  font-size: 0.95rem;
+}
+
+th {
+  background: #eef1f8;
+  color: var(--doux);
+  font-weight: 600;
+}

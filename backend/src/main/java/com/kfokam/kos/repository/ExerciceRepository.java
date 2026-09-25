@@ -17,7 +17,11 @@ public interface ExerciceRepository extends JpaRepository<Exercice, Long> {
 
     Optional<Exercice> findBySessionIdAndEtudiantId(Long sessionId, Long etudiantId);
 
+    boolean existsBySessionIdAndEtudiantId(Long sessionId, Long etudiantId);
+
     long countBySessionIdAndEtudiantId(Long sessionId, Long etudiantId);
 
-    List<Exercice> findByStatut(String statut);
+    long countByEtudiantId(Long etudiantId);
+
+    List<Exercice> findByEtudiantId(Long etudiantId);
 }

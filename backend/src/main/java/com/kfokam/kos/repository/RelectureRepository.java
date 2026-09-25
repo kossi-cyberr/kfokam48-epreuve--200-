@@ -9,13 +9,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RelectureRepository extends JpaRepository<Relecture, Long> {
 
-    List<Relecture> findByExerciceIdOrderByCreatedAtAsc(Long exerciceId);
-
     Optional<Relecture> findByExerciceId(Long exerciceId);
 
-    long countByExerciceId(Long exerciceId);
+    boolean existsByExerciceId(Long exerciceId);
 
     List<Relecture> findByExerciceIdIn(List<Long> exerciceIds);
 
-    boolean existsByExerciceId(Long exerciceId);
+    /** Relectures assignées à un relecteur. */
+    List<Relecture> findByRelecteurId(Long relecteurId);
+
+    /** Relectures assignées mais pas encore rendues (note en attente). */
+    List<Relecture> findByRelecteurIdAndNoteIsNull(Long relecteurId);
+
+    long countByRelecteurIdAndNoteIsNull(Long relecteurId);
 }

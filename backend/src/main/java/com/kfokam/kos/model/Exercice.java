@@ -2,6 +2,8 @@ package com.kfokam.kos.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,9 +45,6 @@ public class Exercice {
 
     @Column
     private Instant updatedAt;
-
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
 
     @PrePersist
     void onCreate() {

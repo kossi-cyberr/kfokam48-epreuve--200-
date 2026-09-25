@@ -7,7 +7,8 @@ public interface PresenceService {
 
     PresenceResponse markPresence(String code, Long etudiantId);
 
-    PresenceResponse addManualPresence(Long presenceId, Long etudiantId);
+    /** RG14 : présence ajoutée à la main par le formateur (source = FORMATEUR). */
+    PresenceResponse addManualPresence(Long sessionId, Long etudiantId);
 
     List<PresenceResponse> findAllBySessionId(Long sessionId);
 

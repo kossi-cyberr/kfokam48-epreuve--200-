@@ -14,4 +14,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByNomContainingIgnoreCase(String nom);
 
     List<Student> findByIdIn(List<Long> ids);
+
+    List<Student> findByPromotionId(Long promotionId);
 }

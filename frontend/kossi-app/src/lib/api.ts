@@ -72,7 +72,8 @@ export interface Exercice {
   sessionId: number;
   etudiantId: number;
   lien: string;
-  statut: "EN_ATTENTE" | "RELU" | "VALIDEE" | string;
+  // Enveloppe : PROVISOIRE = un seul des 2 relecteurs a rendu, RELEVE = les deux ont rendu (note = moyenne)
+  statut: "EN_ATTENTE" | "PROVISOIRE" | "RELEVE" | "VALIDEE" | string;
 }
 
 export interface Relecture {

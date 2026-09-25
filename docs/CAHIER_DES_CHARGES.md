@@ -90,7 +90,7 @@ L'application est conçue pour être utilisée en salle de cours par un formateu
 | RG5 | Un code de présence ne peut être utilisé qu'une seule fois | Q2, Q3 |
 | RG6 | La présence d'un étudiant existe une seule fois par session | Q3 |
 | RG7 | Un relecteur est choisi au hasard parmi les étudiants présents à la session | Q7 |
-| RG8 | Un seul relecteur par exercice | Q6 |
+| RG8 | Deux relecteurs par exercice (enveloppe, étape 3) ; la note retenue est la moyenne des deux ; si un seul a rendu, la note est affichée mais marquée PROVISOIRE | Q6 + enveloppe |
 | RG9 | Une relecture peut être modifiée tant que le formateur n'a pas clôturé la session | Q10 |
 | RG10 | Une relecture validée reste définitif une fois le formateur clôturé la session | Q15 |
 | RG11 | Un exercice reste "en attente" tant que le relecteur ne l'a pas relu | Q11 |

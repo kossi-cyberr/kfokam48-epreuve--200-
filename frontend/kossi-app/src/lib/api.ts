@@ -103,6 +103,8 @@ export interface LigneTableau {
   presences: number;
   exercicesDeposes: number;
   moyenne: number | null;
+  /** Enveloppe : vrai si un seul des 2 relecteurs a rendu (note affichée mais provisoire) */
+  moyenneProvisoire: boolean;
   relecturesEnAttente: number;
 }
 

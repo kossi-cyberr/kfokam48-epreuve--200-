@@ -391,6 +391,9 @@ paths:
                     presences: { type: integer }
                     exercicesDeposes: { type: integer }
                     moyenne: { type: number, nullable: true }
+                    moyenneProvisoire:
+                      type: boolean
+                      description: "Enveloppe : vrai si un seul des 2 relecteurs a rendu (note affichée mais provisoire)"
                     relecturesEnAttente: { type: integer }
         "404": { $ref: "#/components/responses/Erreur" }   # PROMOTION_INCONNUE
 

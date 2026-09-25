@@ -95,29 +95,37 @@ export default function PageRelecteur() {
       <section className="carte">
         <h2>Mes relectures assignées</h2>
         <p className="info">
-          Note entière de 0 à 20 (Q9). Un seul relecteur par exercice (Q6). Correction possible jusqu&apos;à
-          la clôture de la session (Q10).
+          Note entière de 0 à 20 (Q9). Deux relecteurs par exercice depuis l&apos;enveloppe (RG8).
+          Correction possible jusqu&apos;à la clôture de la session (Q10).
         </p>
         {chargement && <p className="info">Chargement…</p>}
         {relectures.length === 0 && !chargement && (
           <p className="info">
-            Aucune relectures assignée. Le relecteur est choisi au hasard parmi les étudiants présents (Q7).
+            Aucune relecture assignée. Le relecteur est choisi au hasard parmi les étudiants présents (Q7).
           </p>
         )}
         {relectures.map((r) => {
           const exercice = exercices[r.exerciceId];
           return (
-            <div key={r.id} style={{ borderTop: "1px solid var(--bordure)", padding: "0.75rem 0" }}>
-              <p>
-                <strong>Exercice #{r.exerciceId}</strong> —{" "}
+            <div key={r.id} className="bloc-relecture">
+              <div className="entete-bloc">
+                <p>
+                  <strong>Exercice #{r.exerciceId}</strong>
+                </p>
+                {r.note == null ? (
+                  <span className="badge badge-orange">À rendre</span>
+                ) : (
+                  <span className="badge badge-vert">Rendue : {r.note}/20</span>
+                )}
+              </div>
+              <p className="info" style={{ wordBreak: "break-all" }}>
                 {exercice ? (
                   <a href={exercice.lien} target="_blank" rel="noreferrer">
                     {exercice.lien}
                   </a>
                 ) : (
                   "lien indisponible"
-                )}{" "}
-                — {r.note == null ? "À rendre" : `Rendue : ${r.note}/20`}
+                )}
               </p>
               <label htmlFor={`note-${r.id}`}>Note /20</label>
               <input

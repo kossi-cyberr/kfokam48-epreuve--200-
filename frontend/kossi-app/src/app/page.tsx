@@ -9,6 +9,14 @@ import { api, ApiError, type Promotion, type Session } from "@/lib/api";
 // La moyenne affichée VIENT de l'API — elle n'est jamais recalculée ici (F3).
 // =============================================================================
 
+function BadgeSession({ clotee }: { clotee: boolean }) {
+  return clotee ? (
+    <span className="badge badge-gris">Clôturée</span>
+  ) : (
+    <span className="badge badge-vert">Ouverte</span>
+  );
+}
+
 export default function PageFormateur() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [promotionId, setPromotionId] = useState<number | null>(null);
@@ -55,7 +63,7 @@ export default function PageFormateur() {
       const s = await api.ouvrirSession(titre.trim(), promotionId);
       setSessionOuverte(s);
       setTitre("");
-      setMessage(`Session ouverte — code de présence : ${s.code} (valide 15 minutes)`);
+      setMessage(`Session « ${s.titre} » ouverte.`);
       void chargerTout(promotionId);
     } catch (e) {
       setErreur(e instanceof ApiError ? `${e.code} — ${e.message}` : "Erreur inattendue");
@@ -80,7 +88,9 @@ export default function PageFormateur() {
 
       <section className="carte">
         <h2>Ouvrir une session</h2>
-        {promotions.length === 0 && <p className="info">Aucune promotion (vérifiez que le backend est démarré).</p>}
+        {promotions.length === 0 && (
+          <p className="info">Aucune promotion (vérifiez que le backend est démarré).</p>
+        )}
         <label htmlFor="titre">Titre de la session</label>
         <input
           id="titre"
@@ -92,10 +102,13 @@ export default function PageFormateur() {
           Ouvrir la session
         </button>
         {sessionOuverte && (
-          <p className="succes">
-            Code de présence : <strong>{sessionOuverte.code}</strong> — expire à{" "}
-            {new Date(sessionOuverte.expirationAt).toLocaleTimeString("fr-FR")}
-          </p>
+          <div className="code-encadre" role="status">
+            <span className="code-valeur">{sessionOuverte.code}</span>
+            <span className="info">
+              Code de présence — expire à{" "}
+              {new Date(sessionOuverte.expirationAt).toLocaleTimeString("fr-FR")} (RG1 : 15 min)
+            </span>
+          </div>
         )}
         {message && <p className="succes">{message}</p>}
         {erreur && <p className="erreur">{erreur}</p>}
@@ -104,50 +117,70 @@ export default function PageFormateur() {
       <section className="carte">
         <h2>Sessions récentes</h2>
         {chargement && <p className="info">Chargement…</p>}
-        {sessions.length === 0 && !chargement && <p className="info">Aucune session pour cette promotion.</p>}
-        <ul>
+        {sessions.length === 0 && !chargement && (
+          <p className="info">Aucune session pour cette promotion.</p>
+        )}
+        <ul className="liste-sessions">
           {sessions.map((s) => (
-            <li key={s.id} style={{ marginBottom: "0.5rem" }}>
-              <strong>{s.titre}</strong> — code {s.code} —{" "}
-              {s.clotee ? "clôturée" : `ouverte jusqu'à ${new Date(s.expirationAt).toLocaleTimeString("fr-FR")}`}{" "}
-              {!s.clotee && (
-                <button className="secondaire" onClick={() => cloturer(s.id)}>
-                  Clôturer
-                </button>
-              )}
+            <li key={s.id}>
+              <div>
+                <strong>{s.titre}</strong>
+                <div className="info">
+                  code <code>{s.code}</code> —{" "}
+                  {s.clotee
+                    ? "clôturée"
+                    : `ouverte jusqu'à ${new Date(s.expirationAt).toLocaleTimeString("fr-FR")}`}
+                </div>
+              </div>
+              <div className="ligne-actions">
+                <BadgeSession clotee={s.clotee} />
+                {!s.clotee && (
+                  <button className="secondaire" onClick={() => cloturer(s.id)}>
+                    Clôturer
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="carte">
-        <h2>Tableau récapitulatif (moyenne calculée par l&apos;API)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Étudiant</th>
-              <th>Présences</th>
-              <th>Exercices déposés</th>
-              <th>Moyenne /20</th>
-              <th>Relectures en attente</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableau.map((ligne) => (
-              <tr key={ligne.etudiantId}>
-                <td>{ligne.nom}</td>
-                <td>{ligne.presences}</td>
-                <td>{ligne.exercicesDeposes}</td>
-                <td>
-                  {ligne.moyenne == null
-                    ? "—"
-                    : ligne.moyenne.toFixed(2) + (ligne.moyenneProvisoire ? " (provisoire)" : "")}
-                </td>
-                <td>{ligne.relecturesEnAttente}</td>
+        <h2>Tableau récapitulatif</h2>
+        <p className="info">Moyenne calculée par l&apos;API — jamais recalculée ici (RG15).</p>
+        <div className="tableau-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Étudiant</th>
+                <th>Présences</th>
+                <th>Exercices déposés</th>
+                <th>Moyenne /20</th>
+                <th>Relectures en attente</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tableau.map((ligne) => (
+                <tr key={ligne.etudiantId}>
+                  <td>{ligne.nom}</td>
+                  <td>{ligne.presences}</td>
+                  <td>{ligne.exercicesDeposes}</td>
+                  <td>
+                    {ligne.moyenne == null ? (
+                      "—"
+                    ) : (
+                      <>
+                        {ligne.moyenne.toFixed(2)}{" "}
+                        {ligne.moyenneProvisoire && <span className="badge badge-orange">provisoire</span>}
+                      </>
+                    )}
+                  </td>
+                  <td>{ligne.relecturesEnAttente}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {tableau.length === 0 && !chargement && <p className="info">Tableau vide.</p>}
       </section>
     </>

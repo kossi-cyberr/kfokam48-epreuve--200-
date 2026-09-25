@@ -10,6 +10,13 @@ import { api, ApiError, type Etudiant, type Exercice } from "@/lib/api";
 
 const CLE_ETUDIANT = "kos-etudiant-id";
 
+function BadgeStatut({ statut }: { statut: string }) {
+  if (statut === "EN_ATTENTE") return <span className="badge badge-gris">En attente</span>;
+  if (statut === "PROVISOIRE") return <span className="badge badge-orange">Provisoire</span>;
+  if (statut === "RELEVE") return <span className="badge badge-vert">Relu</span>;
+  return <span className="badge badge-vert">{statut}</span>;
+}
+
 export default function PageEtudiant() {
   const [etudiants, setEtudiants] = useState<Etudiant[]>([]);
   const [etudiantId, setEtudiantId] = useState<number | null>(null);
@@ -81,6 +88,7 @@ export default function PageEtudiant() {
 
   // La session de dépôt est demandée à l'étudiant : on liste les sessions de sa
   // promotion et il choisit. Simplification assumée (sujet : pas de login, Q1).
+  // Ticket #34 (Should) propose de remplacer ce prompt par une liste déroulante.
   async function demanderSession(): Promise<number> {
     const saisie = window.prompt("Numéro de la session pour ce dépôt :");
     const n = Number(saisie);
@@ -135,6 +143,7 @@ export default function PageEtudiant() {
           onChange={(e) => setCode(e.target.value)}
           placeholder="Ex. 3EDDCBCC"
           maxLength={10}
+          autoCapitalize="characters"
         />
         <button onClick={marquerPresence} disabled={etudiantId == null || !code.trim() || chargement}>
           Marquer ma présence
@@ -144,8 +153,8 @@ export default function PageEtudiant() {
       <section className="carte">
         <h2>Déposer mon exercice</h2>
         <p className="info">
-          Dépôt possible jusqu&apos;à la clôture de la session (Q12). Remplacement possible tant que personne
-          n&apos;a commencé la relecture (Q13).
+          Dépôt possible jusqu&apos;à la clôture de la session (Q12). Remplacement possible tant que
+          personne n&apos;a commencé la relecture (Q13).
         </p>
         <label htmlFor="lien">Lien de l&apos;exercice</label>
         <input
@@ -157,17 +166,27 @@ export default function PageEtudiant() {
         <button onClick={deposer} disabled={etudiantId == null || !lien.trim() || chargement}>
           Déposer
         </button>
+
         {mesExercices.length > 0 && (
-          <ul>
+          <div style={{ marginTop: "1rem" }}>
+            <h2>Mes dépôts</h2>
             {mesExercices.map((ex) => (
-              <li key={ex.id}>
-                Session {ex.sessionId} — {ex.statut} —{" "}
+              <div key={ex.id} className="bloc-relecture">
+                <div className="entete-bloc">
+                  <p>
+                    <strong>Session {ex.sessionId}</strong>
+                  </p>
+                  <BadgeStatut statut={ex.statut} />
+                </div>
+                <p className="info" style={{ wordBreak: "break-all" }}>
+                  {ex.lien}
+                </p>
                 <button className="secondaire" onClick={() => remplacerLien(ex)}>
                   Remplacer le lien
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
 

@@ -1,20 +1,18 @@
 # =====================================================================
 # Backend Spring Boot — build multi-stage
-#   1) build : Maven compile et génère le jar
+#   1) build : Maven compile et génère le jar (cache .m2 persistant BuildKit)
 #   2) run   : JRE minimal, non-root, sans sources
 # =====================================================================
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Répertoire Maven de l'hôte fourni par le contexte nommé "m2" (cf. docker-compose.yml)
-# : les dépendances déjà téléchargées sont réutilisées => build rapide, même hors-ligne.
-COPY --from=m2 / /root/.m2/repository
-
 COPY pom.xml .
 COPY src ./src
 
-# Mode hors-ligne d'abord (dépôt local complet), repli en ligne si un artefact manque
-RUN mvn -B -q -o -DskipTests package || mvn -B -DskipTests package
+# Cache de dépendances monté pendant le build : les téléchargements sont
+# conservés d'une construction à l'autre, même si la couche est interrompue.
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -q -DskipTests package
 
 # ------------------------------ image finale ------------------------------
 FROM eclipse-temurin:21-jre-alpine

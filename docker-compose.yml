@@ -48,13 +48,12 @@ services:
   backend:
     build:
       context: ./backend
-      # Dépôt Maven local de l'hôte réutilisé pendant le build (gain de temps énorme)
-      additional_contexts:
-        m2: ${HOME}/.m2/repository
     depends_on:
       db:
         condition: service_healthy
     environment:
+      # Le conteneur écoute sur 8080 (EXPOSE + healthcheck) ; le host mappe 8090 -> 8080
+      SERVER_PORT: 8080
       DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-kos}
       DB_USERNAME: ${POSTGRES_USER:-kos}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-kos}

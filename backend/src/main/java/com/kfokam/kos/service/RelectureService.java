@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface RelectureService {
 
-    /** Q6/Q7 : assigne au hasard un relecteur parmi les étudiants présents à la session. */
+    /** Enveloppe : assigne un relecteur (2 par exercice), tirage au hasard parmi les présents. */
     RelectureResponse assigner(Long exerciceId, Long relecteurId);
 
     /** Contrat imposé : POST /api/relectures/{id} — le relecteur rend note et commentaire. */
@@ -17,7 +17,11 @@ public interface RelectureService {
 
     RelectureResponse findById(Long id);
 
+    /** Première relecture rendue d'un exercice (note provisoire le cas échéant). */
     RelectureResponse findByExerciceId(Long exerciceId);
+
+    /** Toutes les relectures d'un exercice. */
+    List<RelectureResponse> findAllByExerciceId(Long exerciceId);
 
     /** Toutes les relectures assignées à un relecteur (à rendre + rendues, Q10/Q16). */
     List<RelectureResponse> findParRelecteur(Long relecteurId);

@@ -63,8 +63,8 @@ public class RelectureController {
     }
 
     @GetMapping(params = "exerciceId")
-    @Operation(summary = "Relecture d'un exercice donné")
-    public RelectureResponse getByExercice(@RequestParam Long exerciceId) {
-        return relectureService.findByExerciceId(exerciceId);
+    @Operation(summary = "Relectures d'un exercice donné (1 à 2 depuis l'enveloppe)")
+    public List<RelectureResponse> getByExercice(@RequestParam Long exerciceId) {
+        return relectureService.findAllByExerciceId(exerciceId);
     }
 }

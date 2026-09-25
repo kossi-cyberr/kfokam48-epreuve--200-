@@ -3,6 +3,22 @@
 .env.local
 !.env.example
 
+# Java / Maven (malus -5 si commits)
+backend/target/
+*.class
+*.jar
+
+# Node / Next.js (malus -5 si commits)
+node_modules/
+frontend/kossi-app/.next/
+frontend/kossi-app/out/
+dist/
+*.tsbuildinfo
+
+# IDE
+.idea/
+*.iml
+
 # Divers
 *.log
 .DS_Store

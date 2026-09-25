@@ -77,7 +77,15 @@ public class PresenceServiceImpl implements PresenceService {
                 .etudiantId(etudiantId)
                 .source("ETUDIANT")
                 .build();
-        return PresenceResponse.from(presenceRepository.save(presence));
+        try {
+            return PresenceResponse.from(presenceRepository.save(presence));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Bug signalé par le client : deux étudiants saisissant le code en même temps.
+            // La contrainte uq_presence_session_etudiant (V3) tranche : un seul gagne,
+            // le second reçoit 409 DEJA_PRESENT au lieu d'un doublon silencieux.
+            throw new ApiBusinessException("DEJA_PRESENT", "Vous êtes déjà présent à cette session.",
+                    org.springframework.http.HttpStatus.CONFLICT);
+        }
     }
 
     /** Q4 : 5 codes erronés => blocage de 2 minutes. */

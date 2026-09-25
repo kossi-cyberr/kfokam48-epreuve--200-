@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RelectureRepository extends JpaRepository<Relecture, Long> {
 
-    Optional<Relecture> findByExerciceId(Long exerciceId);
+    /** Toutes les relectures d'un exercice (1 ou 2 depuis l'enveloppe : deux relecteurs). */
+    List<Relecture> findByExerciceId(Long exerciceId);
 
     boolean existsByExerciceId(Long exerciceId);
 

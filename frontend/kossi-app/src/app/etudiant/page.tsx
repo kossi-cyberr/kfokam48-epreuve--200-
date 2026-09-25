@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { api, ApiError, type Etudiant, type Exercice } from "@/lib/api";
+import { api, ApiError, type Etudiant, type Exercice, type Session } from "@/lib/api";
 
 // =============================================================================
 // ÉCRAN 2 — ÉTUDIANT : choisir son nom dans la liste (Q1, aucun mot de passe),
-// marquer sa présence avec le code (EF1), déposer / remplacer son exercice (EF2, Q13).
+// marquer sa présence avec le code (EF1), déposer / remplacer son exercice
+// (EF2, Q13) en choisissant sa session dans une liste (ticket #34).
 // =============================================================================
 
 const CLE_ETUDIANT = "kos-etudiant-id";
+const CLE_PROMOTION = "kos-promotion-id";
 
 function BadgeStatut({ statut }: { statut: string }) {
   if (statut === "EN_ATTENTE") return <span className="badge badge-gris">En attente</span>;
@@ -22,10 +24,35 @@ export default function PageEtudiant() {
   const [etudiantId, setEtudiantId] = useState<number | null>(null);
   const [code, setCode] = useState("");
   const [lien, setLien] = useState("");
+  const [sessionsOuvertes, setSessionsOuvertes] = useState<Session[]>([]);
+  const [sessionId, setSessionId] = useState<number | null>(null);
   const [mesExercices, setMesExercices] = useState<Exercice[]>([]);
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  const etudiantChoisi = etudiants.find((e) => e.id === etudiantId);
+
+  // Charge les sessions ouvertes de la promotion de l'étudiant choisi (Q12 :
+  // seules les sessions non clôturées acceptent un dépôt).
+  const chargerSessions = useCallback(async (promotionId: number | null) => {
+    if (promotionId == null) {
+      setSessionsOuvertes([]);
+      return;
+    }
+    try {
+      const toutes = await api.listerSessions(promotionId);
+      const ouvertes = toutes.filter((s) => !s.clotee);
+      setSessionsOuvertes(ouvertes);
+      setSessionId((courante) =>
+        courante != null && ouvertes.some((s) => s.id === courante)
+          ? courante
+          : ouvertes[0]?.id ?? null
+      );
+    } catch {
+      setSessionsOuvertes([]);
+    }
+  }, []);
 
   useEffect(() => {
     const garde = typeof window !== "undefined" ? window.localStorage.getItem(CLE_ETUDIANT) : null;
@@ -53,6 +80,14 @@ export default function PageEtudiant() {
     void chargerMesExercices(id);
   }
 
+  // Dès qu'un étudiant est choisi, on charge les sessions ouvertes de sa promotion
+  useEffect(() => {
+    if (etudiantChoisi?.promotionId != null) {
+      window.localStorage.setItem(CLE_PROMOTION, String(etudiantChoisi.promotionId));
+      void chargerSessions(etudiantChoisi.promotionId);
+    }
+  }, [etudiantChoisi, chargerSessions]);
+
   async function marquerPresence() {
     if (etudiantId == null || !code.trim()) return;
     setErreur(null);
@@ -70,13 +105,13 @@ export default function PageEtudiant() {
   }
 
   async function deposer() {
-    if (etudiantId == null || !lien.trim()) return;
+    if (etudiantId == null || !lien.trim() || sessionId == null) return;
     setErreur(null);
     setMessage(null);
     setChargement(true);
     try {
-      await api.deposerExercice(await demanderSession(), etudiantId, lien.trim());
-      setMessage("Exercice déposé ✔");
+      await api.deposerExercice(sessionId, etudiantId, lien.trim());
+      setMessage(`Exercice déposé pour la session ${sessionId} ✔`);
       setLien("");
       void chargerMesExercices(etudiantId);
     } catch (e) {
@@ -84,18 +119,6 @@ export default function PageEtudiant() {
     } finally {
       setChargement(false);
     }
-  }
-
-  // La session de dépôt est demandée à l'étudiant : on liste les sessions de sa
-  // promotion et il choisit. Simplification assumée (sujet : pas de login, Q1).
-  // Ticket #34 (Should) propose de remplacer ce prompt par une liste déroulante.
-  async function demanderSession(): Promise<number> {
-    const saisie = window.prompt("Numéro de la session pour ce dépôt :");
-    const n = Number(saisie);
-    if (!Number.isInteger(n) || n <= 0) {
-      throw new ApiError("SESSION_INVALIDE", "Numéro de session invalide.");
-    }
-    return n;
   }
 
   async function remplacerLien(exercice: Exercice) {
@@ -156,6 +179,20 @@ export default function PageEtudiant() {
           Dépôt possible jusqu&apos;à la clôture de la session (Q12). Remplacement possible tant que
           personne n&apos;a commencé la relecture (Q13).
         </p>
+        <label htmlFor="session-depot">Session (ouvertes uniquement)</label>
+        <select
+          id="session-depot"
+          value={sessionId ?? ""}
+          onChange={(e) => setSessionId(Number(e.target.value))}
+          disabled={etudiantId == null}
+        >
+          {sessionsOuvertes.length === 0 && <option value="">— aucune session ouverte —</option>}
+          {sessionsOuvertes.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.titre} — code {s.code}
+            </option>
+          ))}
+        </select>
         <label htmlFor="lien">Lien de l&apos;exercice</label>
         <input
           id="lien"
@@ -163,7 +200,10 @@ export default function PageEtudiant() {
           onChange={(e) => setLien(e.target.value)}
           placeholder="https://github.com/…"
         />
-        <button onClick={deposer} disabled={etudiantId == null || !lien.trim() || chargement}>
+        <button
+          onClick={deposer}
+          disabled={etudiantId == null || sessionId == null || !lien.trim() || chargement}
+        >
           Déposer
         </button>
 

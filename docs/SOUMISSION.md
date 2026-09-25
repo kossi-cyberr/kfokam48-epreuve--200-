@@ -19,9 +19,9 @@
 
 | | |
 |---|---|
-| Dépôt (public) | https://github.com/kossi-cyberr/kfokam48-epreuve--200-.git |
-| Commit final — hash complet, 40 caractères | |En cours |
-| Branche | main |
+| Dépôt (public) | https://github.com/kossi-cyberr/kfokam48-epreuve--200- |
+| Commit final — hash complet, 40 caractères | 6751be79e20412e192a09ccc3ea3231c5bc10bdc |
+| Branche | master |
 
 ## Épreuve Git — étape 5
 

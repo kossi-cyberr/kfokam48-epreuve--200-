@@ -42,6 +42,5 @@ Issues ouvertes après la livraison, triées par priorité. Elles constituent le
 | 15 | Le formateur ajoute une présence manuelle depuis son écran | Should | EF6, RG14 | #33 |
 | 16 | L'étudiant choisit sa session de dépôt dans une liste | Should | EF2, Q12 | #34 |
 | 17 | L'écran relecteur affiche le statut PROVISOIRE / RELEVE | Could | RG8 (enveloppe) | #35 |
-| 18 | Modernisation du design des 3 écrans (charte cohérente, mobile ENF1) | Could | ENF1, §1 « rendu non noté » | #43 |
 
 Les tickets 1 à 13 (issues #1 à #15) sont livrés et fermés par les PR #16 à #31.

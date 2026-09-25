@@ -1,70 +1,51 @@
 # CHANGELOG — Épreuve finale fullstack KFOKAM48
 
-Tous les changements apportés au projet sont listés ici.
+Tous les changements notables de ce projet sont documentés ici.
 
----
+## [1.0.0] — 25/09/2026 — [JALON] v1.0
 
-## [1.0.0] — 24/09/2026
+### Réparé (le socle initial ne compilait pas et ne démarrait pas)
+- Champ `createdAt` dupliqué dans `Exercice`, imports `@PrePersist`/`@PreUpdate` manquants,
+  injection `presenceRepository` absente, `RelectureRequest` sans `relecteurId` : compilation rétablie.
+- **Double migration V1** (`V1__create_items.sql` du socle + `V1__create_kos_tables.sql`) :
+  Flyway refusait de démarrer. L'ancienne est supprimée.
+- **Seed** : codes `KFOKAM48-001` (12 caractères) dans une colonne `code VARCHAR(10)` →
+  renommés `DEMOS001`/`DEMOS002`.
+- **Frontend fantôme** : `frontend/kossi-app` était un gitlink sans `.gitmodules` et vide —
+  remplacé par une vraie application Next.js.
 
 ### Ajouté
-
-- **Étape 1 — Analyse et conception** :
-  - `docs/CAHIER_DES_CHARGES.md` : cahier des charges complet (10 sections)
-  - `docs/diagrammes/` : 3 diagrammes Mermaid (D1, D2, D3)
-  - `api/contrat.yaml` : contrat d'API complet (5 opérations imposées + compléments)
-  - `docs/BACKLOG.md` : backlog trié par priorité (Must / Should / Could)
-  - `docs/JOURNAL.md` : journal de bord
-  - Commit `[JALON] analyse` poussé
-
-- **Étape 2 — Première version** :
-  - `backend/` : API Spring Boot 4 (Java 21) avec :
-    - 5 entités : Promotion, Student, Session, Presence, Exercice, Relecture
-    - 14 DTOs
-    - 10 repositories (Spring Data JPA)
-    - 11 services (interfaces + implémentations)
-    - 6 contrôleurs REST
-    - Migrations Flyway (V1 schéma, V2 données de démonstration)
-    - Sécurité Spring (ouverture pour Swagger + healthcheck)
-    - Validation Bean Validation
-    - Gestion centralisée des erreurs (`@RestControllerAdvice`)
-  - `frontend/kossi-app/` : Application Next.js 16 avec :
-    - Page d'accueil : tableau du formateur
-    - Page /pos : marquer sa présence
-    - Page /exercice/new : déposer un exercice
-    - Page /revisiter : faire une relecture
-    - Couche API dédiée (`lib/api.ts`)
-    - Design responsive avec Tailwind CSS 4
-  - `README.md` mis à jour avec le projet KFOKAM48
+- **`GET /api/tableau?promotionId=`** (opération imposée n°5) : présence, dépôts,
+  moyenne (calculée côté API, RG15) et relectures en attente par étudiant (Q16).
+- **Relecture en deux temps** : assignation (`POST /api/relectures/{exerciceId}/assignation`,
+  tirage au hasard parmi les présents, auteur exclu — Q6/Q7/RG7/RG8) puis rendu
+  (`POST /api/relectures/{id}` avec `{note, commentaire}`, conforme à l'annexe B).
+- **Correction de relecture** avant clôture (Q10, RG9) : `PUT /api/relectures/{id}`.
+- **Blocage après 5 codes erronés** (Q4, RG17) : 429 `ETUDIANT_BLOQUE` pendant 2 minutes.
+- **Clôture de session** exposée : `POST /api/sessions/{id}/cloture` (204).
+- Migrations **V3** (relectures assignées, unicité RG6 et exercice, `promotion_id` sur
+  students) et **V4** (backfill promotion des étudiants de démo).
+- **Frontend Next.js 16 / React 19** : écran formateur (session + tableau), écran étudiant
+  (présence + dépôt/remplacement), écran relecteur (rendre/corriger) ; couche API dédiée
+  `lib/api.ts`, états de chargement et d'erreur (F1, F2, F3).
+- **Tests B6** : `PresenceServiceImplTest` (4 unitaires : RG1, RG6, Q4, nominal) et
+  `PresenceIntegrationTest` (4 intégrations Testcontainers : 201/400/410/409).
 
 ### Modifié
-
-- `api/contrat.yaml` : complet, figé avant le premier commit de code
-- `docs/CAHIER_DES_CHARGES.md` : mis à jour pour refléter l'implémentation
-- `docs/JOURNAL.md` : initialisé
-
-### Supprimé
-
-- `backend/src/main/java/com/kfokam/kos/model/Item.java` (ancien modèle de démonstration)
-- `backend/src/main/java/com/kfokam/kos/controller/ItemController.java`
-- `backend/src/main/java/com/kfokam/kos/repository/ItemRepository.java`
-- `backend/src/main/java/com/kfokam/kos/service/ItemService.java`
-- `backend/src/main/java/com/kfokam/kos/service/impl/ItemServiceImpl.java`
-- `backend/src/main/java/com/kfokam/kos/dto/ItemRequest.java`
-- `backend/src/main/java/com/kfokam/kos/dto/ItemResponse.java`
+- **Codes HTTP conformes au contrat** : code inconnu 400, code expiré 410, déjà présent /
+  exercice déjà déposé / relecture déjà rendue 409, auto-relecture / relecture débutée 403 —
+  auparavant tout renvoyait 404.
+- **Format d'erreur imposé** `{ "code": "...", "message": "..." }` partout (B4) ;
+  l'ancien `ApiError` (timestamp/status/path) est supprimé.
+- `@Valid` sur tous les `@RequestBody` ; statut `RELU` appliqué à l'exercice après relecture.
+- `contrat.yaml` version 1.1 aligné sur l'implémentation et l'annexe B.
+- Cahier des charges 1.1 (RG5 reformulée, RG17 à RG19), D2/D3 réécrits et alignés,
+  README testé, journal complété.
 
 ---
 
-## Notes sur l'historique
+## Historique des jalons
 
-- L'analyse (étape 1) est documentée et figée.
-- La première version (étape 2) est implémentée avec les tickets Must.
-- L'enveloppe (étape 3) n'a pas été fournie lors de l'épreuve.
-- La version finale (étape 4) est en préparation.
-- L'épreuve Git (étape 5) n'est pas encore effectuée.
-- La soumission (étape 6) n'est pas encore faite.
-
----
-
-## Définitions de version
-
-- **1.0.0** : Première version stable (étape 2, v0.1)
+- `[JALON] analyse` — cahier des charges, 4 diagrammes Mermaid, contrat complété, issues créées.
+- `[JALON] v0.1` — première version de l'API (Must), README, backlog trié.
+- `[JALON] v1.0` — socle réparé et conforme, frontend livré, tests verts, docs à jour.

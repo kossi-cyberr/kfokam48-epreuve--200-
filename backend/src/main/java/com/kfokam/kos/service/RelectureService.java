@@ -19,6 +19,6 @@ public interface RelectureService {
 
     RelectureResponse findByExerciceId(Long exerciceId);
 
-    /** Relectures assignées à un relecteur et pas encore rendues. */
-    List<RelectureResponse> findEnAttente(Long relecteurId);
+    /** Toutes les relectures assignées à un relecteur (à rendre + rendues, Q10/Q16). */
+    List<RelectureResponse> findParRelecteur(Long relecteurId);
 }

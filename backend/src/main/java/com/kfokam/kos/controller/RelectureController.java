@@ -57,9 +57,9 @@ public class RelectureController {
     }
 
     @GetMapping(params = "relecteurId")
-    @Operation(summary = "Relectures en attente pour un relecteur (Q11, Q16)")
-    public List<RelectureResponse> enAttente(@RequestParam Long relecteurId) {
-        return relectureService.findEnAttente(relecteurId);
+    @Operation(summary = "Toutes les relectures assignées à un relecteur (à rendre et rendues, Q10/Q16)")
+    public List<RelectureResponse> parRelecteur(@RequestParam Long relecteurId) {
+        return relectureService.findParRelecteur(relecteurId);
     }
 
     @GetMapping(params = "exerciceId")

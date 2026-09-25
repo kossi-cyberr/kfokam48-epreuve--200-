@@ -2,33 +2,42 @@
 
 ```mermaid
 classDiagram
+    class Promotion {
+        +Long id
+        +String nom
+    }
+
+    class Student {
+        +Long id
+        +String nom
+        +String prenom
+        +String matricule
+        +Long promotionId
+    }
+
     class Session {
         +Long id
-        +String code
-        +LocalDateTime ouvertureAt
-        +LocalDateTime expirationAt
-        +Boolean clotee
         +String titre
+        +String code
+        +Instant ouvertureAt
+        +Instant expirationAt
+        +Boolean clotee
         +Long promotionId
-        +Date creationAt
     }
 
     class Presence {
         +Long id
-        +Long etudiantId
         +Long sessionId
+        +Long etudiantId
         +String source
-        +LocalDateTime createdAt
     }
 
     class Exercice {
         +Long id
-        +Long etudiantId
         +Long sessionId
+        +Long etudiantId
         +String lien
         +String statut
-        +LocalDateTime createdAt
-        +LocalDateTime updatedAt
     }
 
     class Relecture {
@@ -37,91 +46,27 @@ classDiagram
         +Long relecteurId
         +Integer note
         +String commentaire
-        +LocalDateTime createdAt
-        +LocalDateTime updatedAt
     }
 
-    Session "1" --> "0..*" Presence : contient
-    Session "1" --> "0..*" Exercice : contient
-    Presence "1" --> "1" Session : appartient à
-    Exercice "1" --> "1" Session : appartient à
-    Relecture "1" --> "1" Exercice : corrige
-    Relecture "1" --> "1" Presence : du relecteur
+    Promotion "1" --> "0..*" Session : organise
+    Promotion "1" --> "0..*" Student : regroupe
+    Session "1" --> "0..*" Presence : recueille
+    Session "1" --> "0..*" Exercice : recoit
+    Student "1" --> "0..*" Presence : marque
+    Student "1" --> "0..*" Exercice : depose
+    Student "1" --> "0..*" Relecture : effectue
+    Exercice "1" --> "0..1" Relecture : subit
 ```
 
-# D2 — Diagramme de classes (modèle de données)
+## Correspondance avec les migrations (V1 + V3)
 
-Les entités principales sont :
-
-- **Session** : contient le code de présence, la date d'ouverture, l'expiration (15 min après), le statut (ouverte/clôturée), le titre, la promotion.
-- **Presence** : associé à un étudiant et à une session, avec une source (ETUDIANT ou FORMATEUR), correspondant à Q14 (ajout manuel par le formateur).
-- **Exercice** : lié à un étudiant et à une session, avec un lien, un statut (en attente / relu / validé), la date de création et de mise à jour.
-- **Relecture** : note (0-20) et commentaire, liée à un exercice et à un relecteur, avec les dates de création et de mise à jour.
+- **promotions** (V1) : id, nom.
+- **students** (V1 + V3) : nom, prenom, matricule UNIQUE, promotion_id (tableau par promotion, Q16).
+- **sessions** (V1) : titre, code, ouverture_at, expiration_at (RG1 : 15 min), clotee, promotion_id.
+- **presences** (V1 + V3) : source ETUDIANT|FORMATEUR (Q14), UNIQUE (session_id, etudiant_id) = RG6.
+- **exercices** (V1 + V3) : lien, statut EN_ATTENTE|RELU|VALIDEE, UNIQUE (session_id, etudiant_id).
+- **relectures** (V1 + V3) : relecteur_id, note nullable (null tant que non rendue), commentaire nullable, UNIQUE (exercice_id) = RG8 (un seul relecteur, Q6).
 
 L'attribut `source` de Presence est `ETUDIANT` ou `FORMATEUR`, conformément à Q14.
 
-L'état du statut de Exercice est : `EN_ATTENTE`, `RELU`, `VALIDEE`, correspondant à Q11 (en attente) et à Q15 (validée).
-
-# D2 — Diagramme de classes (modèle de données)
-
-```mermaid
-classDiagram
-    class Session {
-        +Long id
-        +String code
-        +LocalDateTime ouvertureAt
-        +LocalDateTime expirationAt
-        +Boolean clotee
-        +String titre
-        +Long promotionId
-        +Date creationAt
-    }
-
-    class Presence {
-        +Long id
-        +Long etudiantId
-        +Long sessionId
-        +String source
-        +LocalDateTime createdAt
-    }
-
-    class Exercice {
-        +Long id
-        +Long etudiantId
-        +Long sessionId
-        +String lien
-        +String statut
-        +LocalDateTime createdAt
-        +LocalDateTime updatedAt
-    }
-
-    class Relecture {
-        +Long id
-        +Long exerciceId
-        +Long relecteurId
-        +Integer note
-        +String commentaire
-        +LocalDateTime createdAt
-        +LocalDateTime updatedAt
-    }
-
-    Session "1" --> "0..*" Presence : contient
-    Session "1" --> "0..*" Exercice : contient
-    Presence "1" --> "1" Session : appartient à
-    Exercice "1" --> "1" Session : appartient à
-    Relecture "1" --> "1" Exercice : corrige
-    Relecture "1" --> "1" Presence : du relecteur
-```
-
-# D2 — Diagramme de classes (modèle de données)
-
-Les entités principales sont :
-
-- **Session** : contient le code de présence, la date d'ouverture, l'expiration (15 min après), le statut (ouverte/clôturée), le titre, la promotion.
-- **Presence** : associé à un étudiant et à une session, avec une source (ETUDIANT ou FORMATEUR), correspondant à Q14 (ajout manuel par le formateur).
-- **Exercice** : lié à un étudiant et à une session, avec un lien, un statut (en attente / relu / validé), la date de création et de mise à jour.
-- **Relecture** : note (0-20) et commentaire, liée à un exercice et à un relecteur, avec les dates de création et de mise à jour.
-
-L'attribut `source` de Presence est `ETUDIANT` ou `FORMATEUR`, conformément à Q14.
-
-L'état du statut de Exercice est : `EN_ATTENTE`, `RELU`, `VALIDEE`, correspondant à Q11 (en attente) et à Q15 (validée).
+Le statut de Exercice : `EN_ATTENTE`, `RELU`, `VALIDEE`, correspondant à Q11 (en attente) et à Q15 (validée).

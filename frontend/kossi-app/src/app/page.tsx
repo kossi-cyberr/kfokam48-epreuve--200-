@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { api, ApiError, type Promotion, type Session } from "@/lib/api";
+import { api, ApiError, type Etudiant, type Promotion, type Session } from "@/lib/api";
 
 // =============================================================================
 // ÉCRAN 1 — FORMATEUR : ouvrir une session (code de présence), clôturer,
-// consulter le tableau récapitulatif (EF5, EF6, EF7).
+// ajouter une présence à la main (EF6, ticket #33), consulter le tableau
+// récapitulatif (EF5, EF7).
 // La moyenne affichée VIENT de l'API — elle n'est jamais recalculée ici (F3).
 // =============================================================================
 
@@ -24,6 +25,9 @@ export default function PageFormateur() {
   const [sessionOuverte, setSessionOuverte] = useState<Session | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tableau, setTableau] = useState<Awaited<ReturnType<typeof api.tableau>>>([]);
+  const [etudiants, setEtudiants] = useState<Etudiant[]>([]);
+  const [etudiantManuel, setEtudiantManuel] = useState<number | null>(null);
+  const [sessionManuelle, setSessionManuelle] = useState<number | null>(null);
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -53,7 +57,25 @@ export default function PageFormateur() {
         }
       })
       .catch((e) => setErreur(e instanceof ApiError ? e.message : "Erreur inattendue"));
+    api
+      .listerEtudiants()
+      .then(setEtudiants)
+      .catch(() => {
+        // non bloquant : la liste sert aux présences manuelles
+      });
   }, [chargerTout]);
+
+  // Les sessions ouvertes (non clôturées) sont les seules éligibles à une présence manuelle
+  const sessionsOuvertes = sessions.filter((s) => !s.clotee);
+
+  useEffect(() => {
+    // Si la session sélectionnée vient d'être clôturée, on resélectionne
+    if (sessionManuelle != null && !sessionsOuvertes.some((s) => s.id === sessionManuelle)) {
+      setSessionManuelle(sessionsOuvertes[0]?.id ?? null);
+    } else if (sessionManuelle == null && sessionsOuvertes.length > 0) {
+      setSessionManuelle(sessionsOuvertes[0].id);
+    }
+  }, [sessions, sessionManuelle, sessionsOuvertes]);
 
   async function ouvrir() {
     if (promotionId == null || !titre.trim()) return;
@@ -79,6 +101,28 @@ export default function PageFormateur() {
       if (promotionId != null) void chargerTout(promotionId);
     } catch (e) {
       setErreur(e instanceof ApiError ? `${e.code} — ${e.message}` : "Erreur inattendue");
+    }
+  }
+
+  // EF6 / RG14 / Q14 : présence ajoutée par le formateur (source=FORMATEUR)
+  async function ajouterPresenceManuelle() {
+    if (sessionManuelle == null || etudiantManuel == null) return;
+    setErreur(null);
+    setMessage(null);
+    setChargement(true);
+    try {
+      const p = await api.ajouterPresenceManuelle(sessionManuelle, etudiantManuel);
+      const qui = etudiants.find((e) => e.id === etudiantManuel);
+      setMessage(
+        `Présence ajoutée pour ${qui ? `${qui.prenom} ${qui.nom}` : `l'étudiant ${p.etudiantId}`} `
+        + `(source : ${p.source}).`
+      );
+      setEtudiantManuel(null);
+      if (promotionId != null) void chargerTout(promotionId);
+    } catch (e) {
+      setErreur(e instanceof ApiError ? `${e.code} — ${e.message}` : "Erreur inattendue");
+    } finally {
+      setChargement(false);
     }
   }
 
@@ -112,6 +156,53 @@ export default function PageFormateur() {
         )}
         {message && <p className="succes">{message}</p>}
         {erreur && <p className="erreur">{erreur}</p>}
+      </section>
+
+      <section className="carte">
+        <h2>Ajouter une présence à la main</h2>
+        <p className="info">
+          Pour un étudiant dont le téléphone a un souci (Q14). La présence est tracée avec la mention
+          « ajouté par le formateur » (source FORMATEUR, RG14).
+        </p>
+        {sessionsOuvertes.length === 0 ? (
+          <p className="info">Aucune session ouverte : ouvrez d&apos;abord une session.</p>
+        ) : (
+          <>
+            <label htmlFor="session-manuelle">Session (ouvertes uniquement)</label>
+            <select
+              id="session-manuelle"
+              value={sessionManuelle ?? ""}
+              onChange={(e) => setSessionManuelle(Number(e.target.value))}
+            >
+              {sessionsOuvertes.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.titre} — code {s.code}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="etudiant-manuel">Étudiant</label>
+            <select
+              id="etudiant-manuel"
+              value={etudiantManuel ?? ""}
+              onChange={(e) =>
+                setEtudiantManuel(e.target.value ? Number(e.target.value) : null)
+              }
+            >
+              <option value="">— choisir l&apos;étudiant —</option>
+              {etudiants.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.prenom} {e.nom} ({e.matricule})
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={ajouterPresenceManuelle}
+              disabled={sessionManuelle == null || etudiantManuel == null || chargement}
+            >
+              Ajouter la présence
+            </button>
+          </>
+        )}
       </section>
 
       <section className="carte">

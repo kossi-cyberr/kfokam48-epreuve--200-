@@ -166,8 +166,7 @@ La démarche est la suivante, dans l'ordre :
 2. **Première version** (étape 2) : implémentation des tickets Must, commit `[JALON] v0.1`. C'est le moment où l'enveloppe est ouverte, si elle est fournie.
 3. **Enveloppe** (étape 3) : correction du bug signalé par le client et intégration du changement de besoin. Update du cahier des charges et des diagrammes.
 4. **Version finale** (étape 4) : commit `[JALON] v1.0`, `CHANGELOG.md`, README testé à partir d'un clone vierge, backlog trié.
-5. **Épreuve Git** (étape 5) : résolution des 5 situations de l'épreuve Git, sur un second dépôt `kfokam48-gitlab-<matricule>`.
-6. **Soumission** (étape 6) : remplissage de `docs/SOUMISSION.md` et téléversement sur la plateforme avant 18h00.
+5. **Soumission** (étape 5) : remplissage de `docs/SOUMISSION.md` (hash du commit final) et téléversement sur la plateforme avant 18h00.
 
 **Definition of Done — un ticket est terminé quand :**
 - Les critères d'acceptation sont vérifiés.

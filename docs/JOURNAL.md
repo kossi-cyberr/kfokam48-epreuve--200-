@@ -86,20 +86,19 @@ Chaque entrée répond aux trois mêmes questions :
 ## Étape 5 — Soumission
 
 **Fait :**
-- SOUMISSION.md complété (hash du commit final, dépôts vérifiés en navigation privée)
+- Historique restructuré : une branche par issue, une PR par branche, les 17 issues fermées par les PR (#16 à #40)
+- Backlog restant trié : 4 tickets frontend ouverts (#32 à #35), le Must (#32 badge « provisoire ») livré et fermé
+- Enveloppe tracée de bout en bout : issue bug #41 + issue évolution #42, fermées en citant les commits de fix
+- Nettoyage : suppression de la fausse « Épreuve Git » (un résidu de premier jet qui ne faisait partie du sujet), lien mort évité
+- SOUMISSION.md complétée (hash du commit final, dépôt vérifié en navigation privée)
 
 **Bloqué :**
-- —
+- 20 min : impossible de faire pointer SOUMISSION.md sur le hash de son propre commit (cercle logique) — le hash final se reporte dans la copie téléversée sur la plateforme
+
+**IA :**
+- Demande : audit final par rapport au sujet (barème point par point). L'IA a listé 4 écarts ; j'ai vérifié chacun dans mes fichiers et dans les deux documents du sujet avant d'agir.
 
 **Ce que je referais autrement avec une journée de plus :**
-- Une branche + une PR par issue dès l'étape 2 (l'historique est allé trop vite sur master)
+- Une branche + une PR par issue dès l'étape 2 (reconstitué ensuite, mais l'ordre naturel aurait été plus lisible)
 - Un écran « connexion par sélection » partagé entre étudiant et relecteur plutôt qu'un localStorage
 - Des tests sur les autres règles (RG12 remplacement de lien, RG7 tirage au sort)
-
----
-
-## Étape 6 — Soumission
-
-**Fait :**
-
-**Ce que je referais autrement avec une journée de plus :**

@@ -87,8 +87,8 @@ L'application est conçue pour être utilisée en salle de cours par un formateu
 | RG2 | Un étudiant ne peut pas relire son propre exercice | Q5 |
 | RG3 | Une note est un entier compris entre 0 et 20 | Q9 |
 | RG4 | Un étudiant ne peut pas marquer la présence d'un autre étudiant | Q1 |
-| RG5 | Un code de présence ne peut être utilisé qu'une seule fois | Q2, Q3 |
-| RG6 | La présence d'un étudiant existe une seule fois par session | Q3 |
+| RG5 | Un étudiant ne peut marquer sa présence qu'avec le code de la session en cours et non expiré | Q2, Q3 |
+| RG6 | La présence d'un étudiant est unique par session (contrainte d'unicité en base, V3) | Q3 |
 | RG7 | Un relecteur est choisi au hasard parmi les étudiants présents à la session | Q7 |
 | RG8 | Un seul relecteur par exercice | Q6 |
 | RG9 | Une relecture peut être modifiée tant que le formateur n'a pas clôturé la session | Q10 |
@@ -98,7 +98,10 @@ L'application est conçue pour être utilisée en salle de cours par un formateu
 | RG13 | Un étudiant ne peut pas déposer un exercice après clôture de la session | Q3, Q12 |
 | RG14 | La présence ajoutée manuellement est marquée "ajouté par le formateur" | Q14 |
 | RG15 | La moyenne des notes affichée dans le tableau vient de l'API | F3 |
-| RG16 | Le relecteur voit la note et le commentaire mais pas son identité | Q8 |
+| RG16 | L'étudiant relu voit la note et le commentaire mais jamais le nom du relecteur | Q8 |
+| RG17 | Après 5 codes erronés, un étudiant est bloqué 2 minutes (ETUDIANT_BLOQUE, 429) | Q4 |
+| RG18 | Le relecteur est exclu du tirage au sort de son propre exercice ; s'il est seul présent, l'assignation échoue (AUCUN_RELECTEUR_DISPONIBLE) | Q5, Q7 |
+| RG19 | Le dépôt d'un exercice exige une session ouverte (non clôturée) ; l'exercice est unique par étudiant et par session | Q3, Q12 |
 
 ---
 
@@ -180,3 +183,4 @@ La démarche est la suivante, dans l'ordre :
 | Version | Quand | Ce qui a changé et pourquoi |
 |---|---|---|
 | 1 | 24/09/2026 | Version initiale |
+| 1.1 | 25/09/2026 | RG5 reformulée (unicité de présence, pas du code collectif), RG17 (blocage Q4), RG18 (exclusion de l'auteur du tirage), RG19 (dépôt exige session ouverte) ; relecture en deux temps : assignée puis rendue, corrigeable avant clôture (Q10) |

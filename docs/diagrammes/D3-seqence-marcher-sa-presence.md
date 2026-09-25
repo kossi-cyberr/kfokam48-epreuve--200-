@@ -43,24 +43,31 @@ jamais de stack trace (B4).
 
 # D4 (bonus) — États-transitions du cycle de vie d'un exercice
 
+> Mis à jour à l'étape 3 (enveloppe) : chaque exercice est relu par **deux relecteurs**.
+> Les anciens statuts RELU ont évolué en PROVISOIRE / RELEVE.
+
 ```mermaid
 stateDiagram-v2
     direction LR
     [*] --> EN_ATTENTE : POST /api/exercices (201)
-    EN_ATTENTE --> RELU : relecture rendue (POST /api/relectures/{id})
-    EN_ATTENTE --> EN_ATTENTE : lien remplacé (PUT, Q13) tant que non relu
-    EN_ATTENTE --> [*] : relecture annulée (jamais rendue)
-    RELU --> RELU : relecture corrigée (PUT, Q10) tant que session ouverte
-    RELU --> VALIDEE : formateur clôture la session (RG10, Q15)
+    EN_ATTENTE --> EN_ATTENTE : lien remplacé (PUT, Q13) tant qu'aucune relecture assignée
+    EN_ATTENTE --> PROVISOIRE : 1re relecture rendue (POST /api/relectures/{id})
+    PROVISOIRE --> PROVISOIRE : relecture corrigée (PUT, Q10) tant que session ouverte
+    PROVISOIRE --> RELEVE : 2e relecture rendue (note = moyenne des deux)
+    RELEVE --> RELEVE : relecture corrigée (PUT, Q10) tant que session ouverte
+    RELEVE --> VALIDEE : formateur clôture la session (RG10, Q15)
     VALIDEE --> [*]
 ```
 
-Un exercice passe de `EN_ATTENTE` à `RELU` quand le relecteur rend sa relecture,
-puis de `RELU` à `VALIDEE` quand le formateur clôture la session.
+Un exercice passe de `EN_ATTENTE` à `PROVISOIRE` quand le **premier** des deux relecteurs
+rend sa relecture, puis de `PROVISOIRE` à `RELEVE` quand le **second** rend : la note
+retenue est alors la **moyenne des deux** (RG8, enveloppe).
 
 - **EN_ATTENTE** : déposé, aucun relecteur n'a encore rendu. Le lien reste
   remplaçable tant que personne n'a relu (Q13, RG12) — une relecture **assignée**
   mais non rendue ne bloque pas le remplacement.
-- **RELU** : note et commentaire rendus ; le relecteur peut encore corriger
-  tant que la session est ouverte (Q10, RG9).
-- **VALIDEE** : la session est clôturée, la relecture est définitive (Q15, RG10).
+- **PROVISOIRE** : un seul des deux relecteurs a rendu — la note est affichée
+  mais marquée provisoire ; correction possible tant que la session est ouverte (Q10, RG9).
+- **RELEVE** : les deux ont rendu, la note est la moyenne des deux ; les corrections
+  restent possibles tant que la session est ouverte (Q10, RG9).
+- **VALIDEE** : la session est clôturée, les relectures sont définitives (Q15, RG10).

@@ -20,7 +20,7 @@
 | | |
 |---|---|
 | Dépôt (public) | https://github.com/kossi-cyberr/kfokam48-epreuve--200- |
-| Commit final — hash complet, 40 caractères | HASH_FINAL_A_REPORTER |
+| Commit final — hash complet, 40 caractères | 9c98ad588bdf985f650328cd8690f929f55cad93 |
 | Branche | master |
 
 ## Technique
@@ -64,4 +64,4 @@
 
 **Déclaration.** J'ai réalisé ce travail seul. Les outils d'IA étaient autorisés sans restriction et je les ai utilisés ; mon journal indique où et comment j'ai vérifié leurs réponses. Mon dépôt restera public et inchangé jusqu'à la publication des résultats.
 
-Signature : ______________________  Date : __________
+Signature : Jean Bertin KOS (copie téléversée électroniquement)  Date : 25/09/2026

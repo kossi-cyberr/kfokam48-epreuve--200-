@@ -117,6 +117,13 @@ stateDiagram-v2
 - Le lien reste remplaçable tant qu'aucune relecture n'est **assignée** (RG12).
 - Un seul des deux relecteurs a rendu → note affichée mais **provisoire**.
 
+> **Diagramme bonus D4** — Ce cycle de vie est le diagramme D4 (états-transitions d'un
+> exercice, +3 pts au barème d'analyse). Version complète et commentée :
+> [`docs/diagrammes/D3-seqence-marcher-sa-presence.md`](D3-seqence-marcher-sa-presence.md)
+> (D3 + D4 dans le même fichier). Suite à l'enveloppe, les statuts d'origine (RELU) ont
+> évolué en PROVISOIRE / RELEVE pour refléter la double relecture — le diagramme D4 du
+> dépôt a été corrigé en conséquence.
+
 ### Présence
 
 ```mermaid
